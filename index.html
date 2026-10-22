@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recordatorios</title>
+
+  <!-- Configuración PWA y móviles -->
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Recordatorios">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3239/3239952.png">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
+
+  <div class="max-w-xl mx-auto p-4 pb-20">
+    <!-- Encabezado -->
+    <header class="flex justify-between items-center my-4">
+      <div>
+        <h1 class="text-2xl font-black text-brand-600 dark:text-brand-500 tracking-tight flex items-center gap-2">
+          <span>⏰</span> Recordatorios
+        </h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Organiza tus tareas y notificaciones</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 transition" title="Cambiar tema">
+          🌙
+        </button>
+        <button id="backupBtn" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 transition" title="Copia de seguridad">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- Banner de Permiso de Notificaciones -->
+    <div id="notifBanner" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 p-3 rounded-xl mb-6 text-xs flex justify-between items-center">
+      <span>Activa las notificaciones para recibir alertas a tiempo.</span>
+      <button id="enableNotifBtn" class="bg-amber-600 text-white px-2.5 py-1 rounded font-bold hover:bg-amber-700 transition">
+        Activar
+      </button>
+    </div>
+
+    <!-- Formulario para crear Recordatorio -->
+    <section class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-200/80 dark:border-gray-700 mb-6">
+      <form id="reminderForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Título *</label>
+          <input type="text" id="title" placeholder="Ej. Tomar medicamento o reunión" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Fecha y Hora *</label>
+            <input type="datetime-local" id="time" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Categoría</label>
+            <select id="category" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="Personal">👤 Personal</option>
+              <option value="Trabajo">💼 Trabajo</option>
+              <option value="Salud">🏥 Salud</option>
+              <option value="Hogar">🏠 Hogar</option>
+              <option value="Estudios">📚 Estudios</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Prioridad</label>
+            <select id="priority" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="Baja">🟢 Baja</option>
+              <option value="Media" selected>🟡 Media</option>
+              <option value="Alta">🔴 Alta</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Nota (Opcional)</label>
+            <input type="text" id="notes" placeholder="Detalles o descripción..." class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-sm shadow transition duration-150">
+          Guardar Recordatorio
+        </button>
+      </form>
+    </section>
+
+    <!-- Controles: Búsqueda y Filtros -->
+    <section class="mb-4 space-y-3">
+      <div class="flex gap-2">
+        <input type="text" id="searchInput" placeholder="Buscar recordatorios..." class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+        <select id="filterCategory" class="px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          <option value="Todas">Todas las categorías</option>
+          <option value="Personal">Personal</option>
+          <option value="Trabajo">Trabajo</option>
+          <option value="Salud">Salud</option>
+          <option value="Hogar">Hogar</option>
+          <option value="Estudios">Estudios</option>
+        </select>
+      </div>
+
+      <div class="flex border-b border-gray-200 dark:border-gray-700 text-sm">
+        <button id="tabPending" class="py-2 px-4 border-b-2 border-brand-600 text-brand-600 dark:text-brand-400 font-bold">Pendientes</button>
+        <button id="tabCompleted" class="py-2 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400">Completados</button>
+      </div>
+    </section>
+
+    <!-- Lista de Recordatorios -->
+    <main>
+      <div id="reminderList" class="space-y-3"></div>
+      <div id="emptyState" class="hidden text-center py-10 text-gray-400">
+        <span class="text-4xl block mb-2">📋</span>
+        <p class="text-sm">No hay recordatorios en esta sección.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Ventana Modal de Copia de Seguridad -->
+  <dialog id="backupModal" class="p-6 rounded-2xl bg-white dark:bg-gray-800 dark:text-gray-100 border-0 shadow-2xl backdrop:bg-black/50 w-11/12 max-w-md">
+    <h3 class="text-lg font-bold mb-3">Copia de Seguridad</h3>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Exporta tus recordatorios o restaura un archivo previamente guardado en JSON.</p>
+    
+    <div class="space-y-3">
+      <button id="exportBtn" class="w-full py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-sm font-semibold rounded-lg border border-gray-300 dark:border-gray-600 transition">
+        📥 Exportar Copia (.json)
+      </button>
+      <div>
+        <label class="block text-xs font-semibold mb-1">Importar archivo de respaldo:</label>
+        <input type="file" id="importInput" accept=".json" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+      </div>
+    </div>
+
+    <div class="mt-6 text-right">
+      <button id="closeModalBtn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-xs font-bold rounded-lg">Cerrar</button>
+    </div>
+  </dialog>
+
+  <script>
+    let reminders = JSON.parse(localStorage.getItem('app_reminders_v2') || '[]');
+    let activeTab = 'pending';
+
+    // Tema Claro/Oscuro
+    const themeToggle = document.getElementById('themeToggle');
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // Notificaciones
+    const notifBanner = document.getElementById('notifBanner');
+    const enableNotifBtn = document.getElementById('enableNotifBtn');
+
+    function checkNotifPermission() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        notifBanner.classList.remove('hidden');
+      } else {
+        notifBanner.classList.add('hidden');
+      }
+    }
+    checkNotifPermission();
+
+    enableNotifBtn.addEventListener('click', () => {
+      Notification.requestPermission().then(() => {
+        checkNotifPermission();
+      });
+    });
+
+    // Audio de Alerta
+    function playAlertSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+      } catch (e) {
+        console.log('Audio error:', e);
+      }
+    }
+
+    // Elementos de la App
+    const reminderForm = document.getElementById('reminderForm');
+    const reminderList = document.getElementById('reminderList');
+    const emptyState = document.getElementById('emptyState');
+    const searchInput = document.getElementById('searchInput');
+    const filterCategory = document.getElementById('filterCategory');
+
+    function saveReminders() {
+      localStorage.setItem('app_reminders_v2', JSON.stringify(reminders));
+      renderReminders();
+    }
+
+    function renderReminders() {
+      reminderList.innerHTML = '';
+      const query = searchInput.value.toLowerCase();
+      const categoryFilter = filterCategory.value;
+
+      const filtered = reminders.filter(item => {
+        const matchesTab = activeTab === 'pending' ? !item.completed : item.completed;
+        const matchesQuery = item.title.toLowerCase().includes(query) || (item.notes && item.notes.toLowerCase().includes(query));
+        const matchesCategory = categoryFilter === 'Todas' || item.category === categoryFilter;
+        return matchesTab && matchesQuery && matchesCategory;
+      });
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      filtered.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+      filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `p-4 rounded-xl border bg-white dark:bg-gray-800 transition duration-150 shadow-sm flex items-start justify-between gap-3 ${
+          item.completed ? 'opacity-60 border-gray-200 dark:border-gray-700' : 'border-gray-200 dark:border-gray-700'
+        }`;
+
+        const priorityColors = {
+          'Baja': 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
+          'Media': 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400',
+          'Alta': 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+        };
+
+        const formattedDate = new Date(item.time).toLocaleString('es-ES', {
+          dateStyle: 'short',
+          timeStyle: 'short'
+        });
+
+        div.innerHTML = `
+          <div class="flex items-start gap-3 w-full">
+            <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete('${item.id}')" class="mt-1 h-4 w-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500">
+            <div class="w-full">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-bold text-sm ${item.completed ? 'line-through text-gray-500' : ''}">${escapeHtml(item.title)}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${priorityColors[item.priority]}">${item.priority}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">${item.category}</span>
+              </div>
+              ${item.notes ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${escapeHtml(item.notes)}</p>` : ''}
+              <span class="text-[11px] text-brand-600 dark:text-brand-400 font-medium block mt-1">📅 ${formattedDate}</span>
+            </div>
+          </div>
+          <button onclick="deleteReminder('${item.id}')" class="text-red-500 hover:text-red-700 p-1 rounded text-xs font-bold transition">
+            🗑️
+          </button>
+        `;
+        reminderList.appendChild(div);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    reminderForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newReminder = {
+        id: Date.now().toString(),
+        title: document.getElementById('title').value,
+        time: document.getElementById('time').value,
+        category: document.getElementById('category').value,
+        priority: document.getElementById('priority').value,
+        notes: document.getElementById('notes').value,
+        completed: false,
+        notified: false
+      };
+
+      reminders.push(newReminder);
+      saveReminders();
+      reminderForm.reset();
+    });
+
+    window.toggleComplete = (id) => {
+      const item = reminders.find(r => r.id === id);
+      if (item) {
+        item.completed = !item.completed;
+        saveReminders();
+      }
+    };
+
+    window.deleteReminder = (id) => {
+      reminders = reminders.filter(r => r.id !== id);
+      saveReminders();
+    };
+
+    // Pestañas
+    const tabPending = document.getElementById('tabPending');
+    const tab
